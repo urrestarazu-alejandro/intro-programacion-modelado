@@ -2,7 +2,9 @@ package ejercicios.modelado.app;
 
 import ejercicios.modelado.app.cajero.Billete;
 import ejercicios.modelado.app.cajero.Cajero;
+import ejercicios.modelado.app.cajero.CajeroException;
 import ejercicios.modelado.app.cajero.CajeroSolucionado;
+import ejercicios.modelado.app.cajero.TarjetaCajero;
 import ejercicios.modelado.app.excepciones.SuperApp;
 import ejercicios.modelado.app.starbucks.Preparacion;
 import ejercicios.modelado.app.starbucks.Starbucks;
@@ -34,20 +36,27 @@ public class App {
         bolsa1.put(Billete.CIEN_EVA, 2);
         bolsa1.put(Billete.MIL, 100);
 
-        bancor.cargarDinero(bolsa1);
+        try {
+            bancor.setCerroElcajero(true);
+            bancor.cargarDinero(bolsa1);
 
-        int montoARetirar = 1500;
+            int montoARetirar = 1200;
+            TarjetaCajero tarjetaCajero = new TarjetaCajero(1234);
 
-        HashMap<Billete, Integer> disponible = bancor.calcularDisponible(montoARetirar);
+            boolean contraseniValida = bancor.validarSeguridad(1111, tarjetaCajero);
 
-        int conteo = bancor.contarBilletes(disponible);
+            if (!contraseniValida) {
+                System.out.println("La contraseña ingresada no es valida.");
+            }
 
-        if (conteo == montoARetirar) {
-            System.out.println("Podes retira el dinero");
-            // retirar
-        } else {
-            System.out.println("No podes retira el dinero. Cajero insuficiente.");
+            bancor.validarSeguridad(999, tarjetaCajero);
+            bancor.validarSeguridad(8888, tarjetaCajero);
+
+            HashMap<Billete, Integer> disponible = bancor.calcularDisponible(montoARetirar);
+        } catch (CajeroException cajeroException) {
+            System.out.println(cajeroException.getMessage());
         }
+
 
         System.out.println(bancor);
 
